@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vexy.parser.cyclonedx &mdash; Vexy - Generate VEX in CDX 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Vexy - Generate VEX in CDX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data-sources.html">Data Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Vexy - Generate VEX in CDX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../vexy.html">vexy</a> &raquo;</li>
+          <li><a href="../parser.html">vexy.parser</a> &raquo;</li>
+      <li>vexy.parser.cyclonedx</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for vexy.parser.cyclonedx</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="c1"># This file is part of Vexy</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1"># Copyright (c) Paul Horton. All Rights Reserved.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains classes and methods for parsing a Component List from CycloneDX BOM documents.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">keyword</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">parseString</span>
+
+<span class="kn">from</span> <span class="nn">cyclonedx.model.bom</span> <span class="kn">import</span> <span class="n">Bom</span>
+<span class="kn">from</span> <span class="nn">cyclonedx.model.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="c1"># See https://github.com/package-url/packageurl-python/issues/65</span>
+<span class="kn">from</span> <span class="nn">packageurl</span> <span class="kn">import</span> <span class="n">PackageURL</span>  <span class="c1"># type: ignore</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">BaseParser</span>
+
+<div class="viewcode-block" id="_KEYWORDS"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._KEYWORDS">[docs]</a><span class="n">_KEYWORDS</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">keyword</span><span class="o">.</span><span class="n">kwlist</span><span class="p">)</span></div>
+<div class="viewcode-block" id="_JSON_IGNORE_KEYS"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._JSON_IGNORE_KEYS">[docs]</a><span class="n">_JSON_IGNORE_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;externalReferences&#39;</span><span class="p">,</span> <span class="s1">&#39;hashes&#39;</span><span class="p">,</span> <span class="s1">&#39;licenses&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="_JSON_KEY_MAPPINGS"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._JSON_KEY_MAPPINGS">[docs]</a><span class="n">_JSON_KEY_MAPPINGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;component_type&#39;</span>
+<span class="p">}</span></div>
+<div class="viewcode-block" id="_XML_IGNORE_KEYS"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._XML_IGNORE_KEYS">[docs]</a><span class="n">_XML_IGNORE_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;externalReferences&#39;</span><span class="p">,</span> <span class="s1">&#39;hashes&#39;</span><span class="p">,</span> <span class="s1">&#39;licenses&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CycloneDxJsonParser"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx.CycloneDxJsonParser">[docs]</a><span class="k">class</span> <span class="nc">CycloneDxJsonParser</span><span class="p">(</span><span class="n">BaseParser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CycloneDxJsonParser.parse_bom"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx.CycloneDxJsonParser.parse_bom">[docs]</a>    <span class="k">def</span> <span class="nf">parse_bom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+            <span class="n">bom_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+            <span class="c1"># Handle Serial Number and Version</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span> <span class="o">=</span> <span class="n">Bom</span><span class="p">(</span><span class="n">serial_number</span><span class="o">=</span><span class="n">bom_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;serialNumber&#39;</span><span class="p">),</span> <span class="n">version</span><span class="o">=</span><span class="n">bom_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Process Metadata</span>
+            <span class="n">bom_metadata_data</span> <span class="o">=</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="n">bom_metadata_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="s1">&#39;+00:00&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">%z&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">_component_from_json</span><span class="p">(</span><span class="n">bom_metadata_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Process Components</span>
+            <span class="n">bom_component_data</span> <span class="o">=</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;components&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">bom_component_data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_component_from_json</span><span class="p">(</span><span class="n">json_data</span><span class="o">=</span><span class="n">c</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="CycloneDxXmlParser"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx.CycloneDxXmlParser">[docs]</a><span class="k">class</span> <span class="nc">CycloneDxXmlParser</span><span class="p">(</span><span class="n">BaseParser</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CycloneDxXmlParser.parse_bom"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx.CycloneDxXmlParser.parse_bom">[docs]</a>    <span class="k">def</span> <span class="nf">parse_bom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+            <span class="n">bom_data</span> <span class="o">=</span> <span class="n">parseString</span><span class="p">(</span><span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+            <span class="k">assert</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">tagName</span> <span class="o">==</span> <span class="s1">&#39;bom&#39;</span>
+
+            <span class="c1"># Handle Serial Number and Version</span>
+            <span class="n">bom_attributes</span> <span class="o">=</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">attributes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span> <span class="o">=</span> <span class="n">Bom</span><span class="p">(</span>
+                <span class="n">serial_number</span><span class="o">=</span><span class="n">bom_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;serialNumber&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">bom_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Process Metadata</span>
+            <span class="n">bom_metadata_data</span> <span class="o">=</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="n">bom_metadata_data</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="s1">&#39;+00:00&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">%z&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">_component_from_xml</span><span class="p">(</span>
+                <span class="n">xml_element</span><span class="o">=</span><span class="n">bom_metadata_data</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Process Components</span>
+            <span class="n">bom_component_data</span> <span class="o">=</span> <span class="n">bom_data</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;components&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bom_components_data</span> <span class="o">=</span> <span class="n">bom_component_data</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">bom_components_data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_component_from_xml</span><span class="p">(</span><span class="n">xml_element</span><span class="o">=</span><span class="n">c</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="_component_from_json"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._component_from_json">[docs]</a><span class="k">def</span> <span class="nf">_component_from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Component</span><span class="p">:</span>
+    <span class="n">jd</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">json_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_JSON_IGNORE_KEYS</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_KEYWORDS</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">_&#39;</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_JSON_KEY_MAPPINGS</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">_JSON_KEY_MAPPINGS</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;purl&#39;</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">PackageURL</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">purl</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">jd</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">Component</span><span class="p">(</span><span class="o">**</span><span class="n">jd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_component_from_xml"><a class="viewcode-back" href="../../../autoapi/vexy/parser/cyclonedx/index.html#vexy.parser.cyclonedx._component_from_xml">[docs]</a><span class="k">def</span> <span class="nf">_component_from_xml</span><span class="p">(</span><span class="n">xml_element</span><span class="p">:</span> <span class="n">Element</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Component</span><span class="p">:</span>
+    <span class="n">jd</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">xml_element</span><span class="o">.</span><span class="n">childNodes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">Element</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">Text</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">nodeName</span> <span class="o">==</span> <span class="s1">&#39;purl&#39;</span><span class="p">:</span>
+                <span class="n">jd</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">e</span><span class="o">.</span><span class="n">nodeName</span><span class="p">:</span> <span class="n">PackageURL</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">purl</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())})</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">nodeName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_XML_IGNORE_KEYS</span><span class="p">:</span>
+                <span class="n">jd</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">e</span><span class="o">.</span><span class="n">nodeName</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()})</span>
+
+    <span class="k">return</span> <span class="n">Component</span><span class="p">(</span><span class="o">**</span><span class="n">jd</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-Present Paul Horton.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+:py:mod:`vexy.parser`
+=====================
+
+.. py:module:: vexy.parser
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   cyclonedx/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   vexy.parser.BaseParser
+
+
+
+
+.. py:class:: BaseParser(input_file: io.TextIOWrapper)
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: input_file(self) -> io.TextIOWrapper
+      :property:
+
+
+   .. py:method:: bom(self) -> cyclonedx.model.bom.Bom
+      :property:
+
+
+   .. py:method:: parse_bom(self) -> None
+      :abstractmethod:
+
+
+

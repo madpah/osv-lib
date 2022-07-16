@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vexy.client &mdash; Vexy - Generate VEX in CDX 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Vexy - Generate VEX in CDX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data-sources.html">Data Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Vexy - Generate VEX in CDX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../vexy.html">vexy</a> &raquo;</li>
+      <li>vexy.client</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for vexy.client</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="c1"># This file is part of Vexy</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1"># Copyright (c) Paul Horton. All Rights Reserved.</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">TextIOWrapper</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">printable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">cyclonedx.model.bom</span> <span class="kn">import</span> <span class="n">Bom</span>
+<span class="kn">from</span> <span class="nn">cyclonedx.output</span> <span class="kn">import</span> <span class="n">BaseOutput</span><span class="p">,</span> <span class="n">OutputFormat</span><span class="p">,</span> <span class="n">SchemaVersion</span>
+<span class="kn">from</span> <span class="nn">rich.console</span> <span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span> <span class="nn">rich.progress</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="kn">from</span> <span class="nn">vexy.parser</span> <span class="kn">import</span> <span class="n">BaseParser</span>
+<span class="kn">from</span> <span class="nn">vexy.parser.cyclonedx</span> <span class="kn">import</span> <span class="n">CycloneDxJsonParser</span><span class="p">,</span> <span class="n">CycloneDxXmlParser</span>
+<span class="kn">from</span> <span class="nn">vexy.sources</span> <span class="kn">import</span> <span class="n">ALL_SOURCES</span>
+<span class="kn">from</span> <span class="nn">vexy.sources.base</span> <span class="kn">import</span> <span class="n">BaseSource</span>
+
+
+<span class="nd">@enum</span><span class="o">.</span><span class="n">unique</span>
+<div class="viewcode-block" id="_CLI_OUTPUT_FORMAT"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client._CLI_OUTPUT_FORMAT">[docs]</a><span class="k">class</span> <span class="nc">_CLI_OUTPUT_FORMAT</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="_CLI_OUTPUT_FORMAT.XML"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client._CLI_OUTPUT_FORMAT.XML">[docs]</a>    <span class="n">XML</span> <span class="o">=</span> <span class="s1">&#39;xml&#39;</span></div>
+<div class="viewcode-block" id="_CLI_OUTPUT_FORMAT.JSON"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client._CLI_OUTPUT_FORMAT.JSON">[docs]</a>    <span class="n">JSON</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="_output_formats"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client._output_formats">[docs]</a><span class="n">_output_formats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">_CLI_OUTPUT_FORMAT</span><span class="p">,</span> <span class="n">OutputFormat</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_CLI_OUTPUT_FORMAT</span><span class="o">.</span><span class="n">XML</span><span class="p">:</span> <span class="n">OutputFormat</span><span class="p">(</span><span class="s1">&#39;Xml&#39;</span><span class="p">),</span>
+    <span class="n">_CLI_OUTPUT_FORMAT</span><span class="o">.</span><span class="n">JSON</span><span class="p">:</span> <span class="n">OutputFormat</span><span class="p">(</span><span class="s1">&#39;Json&#39;</span><span class="p">),</span>
+<span class="p">}</span></div>
+<div class="viewcode-block" id="_output_default_filenames"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client._output_default_filenames">[docs]</a><span class="n">_output_default_filenames</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_CLI_OUTPUT_FORMAT</span><span class="o">.</span><span class="n">XML</span><span class="p">:</span> <span class="s1">&#39;cyclonedx-vex.xml&#39;</span><span class="p">,</span>
+    <span class="n">_CLI_OUTPUT_FORMAT</span><span class="o">.</span><span class="n">JSON</span><span class="p">:</span> <span class="s1">&#39;cyclonedx-vex.json&#39;</span><span class="p">,</span>
+<span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="VexyCmd"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd">[docs]</a><span class="k">class</span> <span class="nc">VexyCmd</span><span class="p">:</span>
+<div class="viewcode-block" id="VexyCmd.DEFAULT_CONFIG_FILE"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd.DEFAULT_CONFIG_FILE">[docs]</a>    <span class="n">DEFAULT_CONFIG_FILE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.vexy.config&#39;</span></div>
+
+    <span class="c1"># Whether debug output is enabled</span>
+<div class="viewcode-block" id="VexyCmd._DEBUG_ENABLED"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._DEBUG_ENABLED">[docs]</a>    <span class="n">_DEBUG_ENABLED</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="c1"># Parsed Arguments</span>
+<div class="viewcode-block" id="VexyCmd._arguments"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._arguments">[docs]</a>    <span class="n">_arguments</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">debug_enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_DEBUG_ENABLED</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">quiet_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debug_message</span><span class="p">(</span><span class="s1">&#39;!!! DEBUG MODE ENABLED !!!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debug_message</span><span class="p">(</span><span class="s1">&#39;Parsed Arguments: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_sources</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">BaseSource</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attempt_source_config_load</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">vexy_config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_quiet</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Vexy is configured to use [bold cyan]</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_sources</span><span class="p">)</span><span class="si">}</span><span class="s1">[/bold cyan] data sources.&#39;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="VexyCmd._attempt_source_config_load"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._attempt_source_config_load">[docs]</a>    <span class="k">def</span> <span class="nf">_attempt_source_config_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">TextIOWrapper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Attempts to Vexy source configuration at the locations</span>
+        <span class="k">with</span> <span class="n">config</span> <span class="k">as</span> <span class="n">config_f</span><span class="p">:</span>
+            <span class="n">vexy_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">config_f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">source_key</span><span class="p">,</span> <span class="n">source_config</span> <span class="ow">in</span> <span class="n">vexy_config</span><span class="p">[</span><span class="s1">&#39;sources&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_sources</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ALL_SOURCES</span><span class="p">[</span><span class="n">source_key</span><span class="p">](</span><span class="n">config</span><span class="o">=</span><span class="n">source_config</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="VexyCmd.get_cli_output_format"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd.get_cli_output_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_cli_output_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_CLI_OUTPUT_FORMAT</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_CLI_OUTPUT_FORMAT</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_format</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VexyCmd._get_output_format"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._get_output_format">[docs]</a>    <span class="k">def</span> <span class="nf">_get_output_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutputFormat</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_output_formats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cli_output_format</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="VexyCmd._is_quiet"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._is_quiet">[docs]</a>    <span class="k">def</span> <span class="nf">_is_quiet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">quiet_enabled</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VexyCmd.execute"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Progress</span><span class="p">()</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">task_parse</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span>
+                <span class="s1">&#39;Parsing CycloneDX BOM for Components&#39;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_quiet</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">start_task</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="n">task_parse</span><span class="p">)</span>
+
+            <span class="n">parser</span><span class="p">:</span> <span class="n">BaseParser</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">input_source</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">):</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">CycloneDxJsonParser</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">input_source</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">input_source</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xml&#39;</span><span class="p">):</span>
+                <span class="n">parser</span> <span class="o">=</span> <span class="n">CycloneDxXmlParser</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">input_source</span><span class="p">)</span>
+
+            <span class="n">parser</span><span class="o">.</span><span class="n">parse_bom</span><span class="p">()</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">task_parse</span><span class="p">,</span> <span class="n">completed</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Parsed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">components</span><span class="p">)</span><span class="si">}</span><span class="s1"> Components from CycloneDX SBOM&#39;</span>
+            <span class="p">)</span>
+
+            <span class="n">vex</span> <span class="o">=</span> <span class="n">Bom</span><span class="p">()</span>
+            <span class="n">data_source_tasks</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">data_source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_sources</span><span class="p">:</span>
+                <span class="n">data_source_tasks</span><span class="p">[</span><span class="n">data_source</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Consulting </span><span class="si">{</span><span class="n">data_source</span><span class="o">.</span><span class="n">source_name</span><span class="p">()</span><span class="si">}</span><span class="s1"> for known vulnerabilities&#39;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_quiet</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">data_source</span><span class="o">.</span><span class="n">process_components</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="n">parser</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">task_id</span><span class="o">=</span><span class="n">data_source_tasks</span><span class="p">[</span><span class="n">data_source</span><span class="o">.</span><span class="vm">__class__</span><span class="p">],</span> <span class="n">completed</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_source</span><span class="o">.</span><span class="n">source_name</span><span class="p">()</span><span class="si">}</span><span class="s1">: Querying for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_source</span><span class="o">.</span><span class="n">valid_components</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;Components&#39;</span>
+                <span class="p">)</span>
+                <span class="n">vulnerabilities</span> <span class="o">=</span> <span class="n">data_source</span><span class="o">.</span><span class="n">get_vulnerabilities</span><span class="p">()</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">task_id</span><span class="o">=</span><span class="n">data_source_tasks</span><span class="p">[</span><span class="n">data_source</span><span class="o">.</span><span class="vm">__class__</span><span class="p">],</span> <span class="n">completed</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_source</span><span class="o">.</span><span class="n">source_name</span><span class="p">()</span><span class="si">}</span><span class="s1">: Processing Vulnerabilities for &#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_source</span><span class="o">.</span><span class="n">valid_components</span><span class="p">)</span><span class="si">}</span><span class="s1"> Components&#39;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># @todo: CALL OUT ANY COMPONENTS THAT WERE NOT QUERIED</span>
+
+                <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vulnerabilities</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">affects</span><span class="p">:</span>
+                        <span class="n">a</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">parser</span><span class="o">.</span><span class="n">bom</span><span class="o">.</span><span class="n">urn</span><span class="p">()</span><span class="si">}</span><span class="s1">#</span><span class="si">{</span><span class="n">quote</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">ref</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">printable</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">vex</span><span class="o">.</span><span class="n">vulnerabilities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                        <span class="n">task_id</span><span class="o">=</span><span class="n">data_source_tasks</span><span class="p">[</span><span class="n">data_source</span><span class="o">.</span><span class="vm">__class__</span><span class="p">],</span>
+                        <span class="n">completed</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">vulnerabilities</span><span class="p">)</span> <span class="o">*</span> <span class="mi">50</span><span class="p">))</span>
+                    <span class="p">)</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">output_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_format</span><span class="p">()</span>
+        <span class="n">outputter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_outputter</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span> <span class="n">bom</span><span class="o">=</span><span class="n">vex</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debug_message</span><span class="p">(</span><span class="s1">&#39;Returning SBOM to STDOUT&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">outputter</span><span class="o">.</span><span class="n">output_as_string</span><span class="p">())</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check directory writable</span>
+        <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_file</span>
+        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span>
+            <span class="n">output_file</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">_output_default_filenames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cli_output_format</span><span class="p">()]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_message</span><span class="p">(</span><span class="s1">&#39;Will be outputting SBOM to file at: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_filename</span><span class="p">))</span>
+        <span class="n">outputter</span><span class="o">.</span><span class="n">output_to_file</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_file_overwrite</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VexyCmd._get_outputter"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._get_outputter">[docs]</a>    <span class="k">def</span> <span class="nf">_get_outputter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="n">OutputFormat</span><span class="p">,</span> <span class="n">bom</span><span class="p">:</span> <span class="n">Bom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOutput</span><span class="p">:</span>
+        <span class="n">schema_version</span> <span class="o">=</span> <span class="n">SchemaVersion</span><span class="p">[</span><span class="s1">&#39;V</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_schema_version</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="p">)]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cyclonedx.output.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_arguments</span><span class="o">.</span><span class="n">output_format</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output_klass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_format</span><span class="o">.</span><span class="n">value</span><span class="si">}{</span><span class="n">schema_version</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown format </span><span class="si">{</span><span class="n">output_format</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">BaseOutput</span><span class="p">,</span> <span class="n">output_klass</span><span class="p">(</span><span class="n">bom</span><span class="o">=</span><span class="n">bom</span><span class="p">))</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="VexyCmd.get_arg_parser"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd.get_arg_parser">[docs]</a>    <span class="k">def</span> <span class="nf">get_arg_parser</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">prog</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">:</span>
+        <span class="n">arg_parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Vexy VEX Generator&#39;</span><span class="p">)</span>
+
+        <span class="n">arg_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">),</span>  <span class="c1"># FileType does handle &#39;-&#39;</span>
+            <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;vexy_config&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">VexyCmd</span><span class="o">.</span><span class="n">DEFAULT_CONFIG_FILE</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Configuration file for Vexy defining data sources to use and their configuration.&#39;</span>
+        <span class="p">)</span>
+        <span class="n">arg_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Quiet - no console output&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;quiet_enabled&#39;</span><span class="p">)</span>
+        <span class="n">arg_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-X&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Enable debug output&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;debug_enabled&#39;</span><span class="p">)</span>
+
+        <span class="n">input_method_group</span> <span class="o">=</span> <span class="n">arg_parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Input CycloneDX BOM&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Where Vexy shall obtain it</span><span class="se">\&#39;</span><span class="s1">s input&#39;</span>
+        <span class="p">)</span>
+        <span class="n">input_method_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--in-file&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">),</span>  <span class="c1"># FileType does handle &#39;-&#39;</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;input_source&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;CycloneDX BOM to read input from. Use &quot;-&quot; to read from STDIN.&#39;</span>
+        <span class="p">)</span>
+
+        <span class="n">output_group</span> <span class="o">=</span> <span class="n">arg_parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;VEX Output Configuration&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Choose the output format and schema version&#39;</span>
+        <span class="p">)</span>
+        <span class="n">output_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--format&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_CLI_OUTPUT_FORMAT</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">_CLI_OUTPUT_FORMAT</span><span class="o">.</span><span class="n">XML</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The output format for your SBOM (default: </span><span class="si">%(default)s</span><span class="s1">)&#39;</span><span class="p">,</span>
+            <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;output_format&#39;</span>
+        <span class="p">)</span>
+        <span class="n">output_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--schema-version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1.4&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;1.4&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The CycloneDX schema version for your VEX (default: </span><span class="si">%(default)s</span><span class="s1">)&#39;</span><span class="p">,</span>
+            <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;output_schema_version&#39;</span>
+        <span class="p">)</span>
+        <span class="n">output_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE_PATH&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Output file path for your SBOM (set to </span><span class="se">\&#39;</span><span class="s1">-</span><span class="se">\&#39;</span><span class="s1"> to output to STDOUT)&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;output_file&#39;</span>
+        <span class="p">)</span>
+        <span class="n">output_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;output_file_overwrite&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;If outputting to a file and the stated file already exists, it will be overwritten.&#39;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">arg_parser</span></div>
+
+<div class="viewcode-block" id="VexyCmd._debug_message"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._debug_message">[docs]</a>    <span class="k">def</span> <span class="nf">_debug_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DEBUG_ENABLED</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DEBUG] - </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">message</span><span class="p">))</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="VexyCmd._error_and_exit"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.VexyCmd._error_and_exit">[docs]</a>    <span class="k">def</span> <span class="nf">_error_and_exit</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">exit_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[ERROR] - </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">message</span><span class="p">))</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../autoapi/vexy/client/index.html#vexy.client.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">prog_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">VexyCmd</span><span class="o">.</span><span class="n">get_arg_parser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="n">prog_name</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">VexyCmd</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-Present Paul Horton.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

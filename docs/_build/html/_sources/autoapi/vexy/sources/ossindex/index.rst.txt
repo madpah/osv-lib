@@ -1,0 +1,87 @@
+:py:mod:`vexy.sources.ossindex`
+===============================
+
+.. py:module:: vexy.sources.ossindex
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   vexy.sources.ossindex.OssIndexSource
+
+
+
+
+.. py:class:: OssIndexSource(*, config: Optional[Dict[str, Any]] = None)
+
+   Bases: :py:obj:`vexy.sources.base.BaseSource`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: _component_complete_for_source(self, component: cyclonedx.model.component.Component) -> bool
+
+      Whether the given Component has enough data (the right fields) for us to query this data source for known
+      vulnerabilities.
+
+      :param component: Component
+      :return: bool
+
+
+   .. py:method:: _configure_source(self, config: Dict[str, Any]) -> None
+
+      Perform any source specific configuration such as authentication.
+
+      :param config: Dict[str, Any]
+      :return: None
+
+
+   .. py:method:: get_vulnerabilities(self) -> Set[cyclonedx.model.vulnerability.Vulnerability]
+
+
+   .. py:method:: source() -> cyclonedx.model.vulnerability.VulnerabilitySource
+      :staticmethod:
+
+      Instance that represents this data source.
+
+      :return: VulnerabilitySource
+
+
+   .. py:method:: source_name() -> str
+      :staticmethod:
+
+      Human-friendly name for this data source.
+
+      :return: str
+
+
+   .. py:method:: source_description() -> str
+      :staticmethod:
+
+      Human-friendly description of this data source.
+
+      :return: str
+
+
+   .. py:method:: source_ecosystems() -> Set[vexy.EcoSystem]
+      :staticmethod:
+
+      Which ecosystems this source has vulnerability data for.
+
+      :return: Set[str]
+
+
+   .. py:method:: source_url() -> str
+      :staticmethod:
+
+      Public URL for this data source
+
+      :return: str
+
+
+

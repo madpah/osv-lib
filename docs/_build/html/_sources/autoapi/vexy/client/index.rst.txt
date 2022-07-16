@@ -1,0 +1,116 @@
+:py:mod:`vexy.client`
+=====================
+
+.. py:module:: vexy.client
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   vexy.client._CLI_OUTPUT_FORMAT
+   vexy.client.VexyCmd
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   vexy.client.main
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   vexy.client._output_formats
+   vexy.client._output_default_filenames
+
+
+.. py:class:: _CLI_OUTPUT_FORMAT
+
+   Bases: :py:obj:`enum.Enum`
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+   .. py:attribute:: XML
+      :annotation: = xml
+
+      
+
+   .. py:attribute:: JSON
+      :annotation: = json
+
+      
+
+
+.. py:data:: _output_formats
+   :annotation: :Dict[_CLI_OUTPUT_FORMAT, cyclonedx.output.OutputFormat]
+
+   
+
+.. py:data:: _output_default_filenames
+   
+
+   
+
+.. py:class:: VexyCmd(args: argparse.Namespace)
+
+   .. py:attribute:: DEFAULT_CONFIG_FILE
+      :annotation: :str = .vexy.config
+
+      
+
+   .. py:attribute:: _DEBUG_ENABLED
+      :annotation: :bool = False
+
+      
+
+   .. py:attribute:: _arguments
+      :annotation: :argparse.Namespace
+
+      
+
+   .. py:method:: _attempt_source_config_load(self, config: io.TextIOWrapper) -> None
+
+
+   .. py:method:: get_cli_output_format(self) -> _CLI_OUTPUT_FORMAT
+
+
+   .. py:method:: _get_output_format(self) -> cyclonedx.output.OutputFormat
+
+
+   .. py:method:: _is_quiet(self) -> bool
+
+
+   .. py:method:: execute(self) -> None
+
+
+   .. py:method:: _get_outputter(self, output_format: cyclonedx.output.OutputFormat, bom: cyclonedx.model.bom.Bom) -> cyclonedx.output.BaseOutput
+
+
+   .. py:method:: get_arg_parser(prog: Optional[str] = None) -> argparse.ArgumentParser
+      :staticmethod:
+
+
+   .. py:method:: _debug_message(self, message: str) -> None
+
+
+   .. py:method:: _error_and_exit(message: str, exit_code: int = 1) -> None
+      :staticmethod:
+
+
+
+.. py:function:: main(prog_name: Optional[str] = None) -> None
+
+

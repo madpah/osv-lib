@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vexy &mdash; Vexy - Generate VEX in CDX 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Vexy - Generate VEX in CDX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data-sources.html">Data Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Vexy - Generate VEX in CDX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>vexy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for vexy</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="c1"># This file is part of Vexy</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1"># Copyright (c) Paul Horton. All Rights Reserved.</span>
+
+<span class="kn">import</span> <span class="nn">enum</span>
+
+
+<div class="viewcode-block" id="EcoSystemType"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystemType">[docs]</a><span class="k">class</span> <span class="nc">EcoSystemType</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">purl_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_purl_type</span> <span class="o">=</span> <span class="n">purl_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="EcoSystemType.name"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystemType.name">[docs]</a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="EcoSystemType.purl_type"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystemType.purl_type">[docs]</a>    <span class="k">def</span> <span class="nf">purl_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_purl_type</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="EcoSystemType.description"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystemType.description">[docs]</a>    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span></div></div>
+
+
+<div class="viewcode-block" id="_ALL_ECOSYSTEMS"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy._ALL_ECOSYSTEMS">[docs]</a><span class="n">_ALL_ECOSYSTEMS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;CARGO&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cargo&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;cargo&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;The Rust community</span><span class="se">\&#39;</span><span class="s1">s crate registry&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;COCOAPODS&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cocoapods&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;cocoapods&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;The Cocoa dependency manager&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;COMPOSER&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Composer&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;composer&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dependency Manager for PHP&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;CONAN&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Conan&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;conan&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;The open-source C/C++ package manager&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;CONDA&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Conda&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;conda&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Conda is a cross-platform, language-agnostic binary package &#39;</span>
+                                                     <span class="s1">&#39;manager&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;CRAN&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cran&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;cran&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Comprehensive R Archive Network&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;GO&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Go&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;golang&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Go Package Managers&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;MAVEN&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Maven&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;maven&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Apache Maven&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;NPM&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NPM&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;npm&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Package manager for the JavaScript programming language&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;NUGET&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NuGet&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;nuget&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Microsoft NuGet&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;PYPI&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;PyPi&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;pypi&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Python Package Index&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;RPM&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;RPM&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;rpm&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Redhat Package Manager&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;RUBY_GEM&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;RubyGems&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;gem&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Ruby package system&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;SWIFT&#39;</span><span class="p">:</span> <span class="n">EcoSystemType</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Swift&#39;</span><span class="p">,</span> <span class="n">purl_type</span><span class="o">=</span><span class="s1">&#39;swift&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Swift Package Manager&#39;</span>
+    <span class="p">)</span>
+<span class="p">}</span></div>
+
+
+<span class="nd">@enum</span><span class="o">.</span><span class="n">unique</span>
+<div class="viewcode-block" id="EcoSystem"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem">[docs]</a><span class="k">class</span> <span class="nc">EcoSystem</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Languages/ecosystems to the PURL type</span>
+
+<span class="sd">    Starting list taken from https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EcoSystem.CARGO"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.CARGO">[docs]</a>    <span class="n">CARGO</span> <span class="o">=</span> <span class="s1">&#39;CARGO&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.COCOAPODS"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.COCOAPODS">[docs]</a>    <span class="n">COCOAPODS</span> <span class="o">=</span> <span class="s1">&#39;COCOAPODS&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.COMPOSER"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.COMPOSER">[docs]</a>    <span class="n">COMPOSER</span> <span class="o">=</span> <span class="s1">&#39;COMPOSER&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.CONAN"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.CONAN">[docs]</a>    <span class="n">CONAN</span> <span class="o">=</span> <span class="s1">&#39;CONAN&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.CONDA"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.CONDA">[docs]</a>    <span class="n">CONDA</span> <span class="o">=</span> <span class="s1">&#39;CONDA&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.CRAN"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.CRAN">[docs]</a>    <span class="n">CRAN</span> <span class="o">=</span> <span class="s1">&#39;CRAN&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.GO"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.GO">[docs]</a>    <span class="n">GO</span> <span class="o">=</span> <span class="s1">&#39;GO&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.MAVEN"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.MAVEN">[docs]</a>    <span class="n">MAVEN</span> <span class="o">=</span> <span class="s1">&#39;MAVEN&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.NPM"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.NPM">[docs]</a>    <span class="n">NPM</span> <span class="o">=</span> <span class="s1">&#39;NPM&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.NUGET"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.NUGET">[docs]</a>    <span class="n">NUGET</span> <span class="o">=</span> <span class="s1">&#39;NUGET&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.PYPI"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.PYPI">[docs]</a>    <span class="n">PYPI</span> <span class="o">=</span> <span class="s1">&#39;PYPI&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.RPM"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.RPM">[docs]</a>    <span class="n">RPM</span> <span class="o">=</span> <span class="s1">&#39;RPM&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.RUBY_GEM"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.RUBY_GEM">[docs]</a>    <span class="n">RUBY_GEM</span> <span class="o">=</span> <span class="s1">&#39;RUBY_GEM&#39;</span></div>
+<div class="viewcode-block" id="EcoSystem.SWIFT"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.SWIFT">[docs]</a>    <span class="n">SWIFT</span> <span class="o">=</span> <span class="s1">&#39;SWIFT&#39;</span></div>
+
+<div class="viewcode-block" id="EcoSystem.get_info"><a class="viewcode-back" href="../autoapi/vexy/index.html#vexy.EcoSystem.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EcoSystemType</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_ALL_ECOSYSTEMS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-Present Paul Horton.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

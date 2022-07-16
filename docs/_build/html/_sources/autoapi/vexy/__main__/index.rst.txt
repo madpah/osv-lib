@@ -1,0 +1,6 @@
+:py:mod:`vexy.__main__`
+=======================
+
+.. py:module:: vexy.__main__
+
+

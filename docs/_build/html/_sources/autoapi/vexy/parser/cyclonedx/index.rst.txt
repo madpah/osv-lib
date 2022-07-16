@@ -1,0 +1,93 @@
+:py:mod:`vexy.parser.cyclonedx`
+===============================
+
+.. py:module:: vexy.parser.cyclonedx
+
+.. autoapi-nested-parse::
+
+   Contains classes and methods for parsing a Component List from CycloneDX BOM documents.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   vexy.parser.cyclonedx.CycloneDxJsonParser
+   vexy.parser.cyclonedx.CycloneDxXmlParser
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   vexy.parser.cyclonedx._component_from_json
+   vexy.parser.cyclonedx._component_from_xml
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   vexy.parser.cyclonedx._KEYWORDS
+   vexy.parser.cyclonedx._JSON_IGNORE_KEYS
+   vexy.parser.cyclonedx._JSON_KEY_MAPPINGS
+   vexy.parser.cyclonedx._XML_IGNORE_KEYS
+
+
+.. py:data:: _KEYWORDS
+   :annotation: :Set[str]
+
+   
+
+.. py:data:: _JSON_IGNORE_KEYS
+   :annotation: = ['externalReferences', 'hashes', 'licenses']
+
+   
+
+.. py:data:: _JSON_KEY_MAPPINGS
+   
+
+   
+
+.. py:data:: _XML_IGNORE_KEYS
+   :annotation: = ['externalReferences', 'hashes', 'licenses']
+
+   
+
+.. py:class:: CycloneDxJsonParser(input_file: io.TextIOWrapper)
+
+   Bases: :py:obj:`vexy.parser.BaseParser`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: parse_bom(self) -> None
+
+
+
+.. py:class:: CycloneDxXmlParser(input_file: io.TextIOWrapper)
+
+   Bases: :py:obj:`vexy.parser.BaseParser`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: parse_bom(self) -> None
+
+
+
+.. py:function:: _component_from_json(json_data: Dict[str, Any]) -> cyclonedx.model.component.Component
+
+
+.. py:function:: _component_from_xml(xml_element: xml.dom.minidom.Element) -> cyclonedx.model.component.Component
+
+

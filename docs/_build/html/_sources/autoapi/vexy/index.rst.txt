@@ -1,0 +1,150 @@
+:py:mod:`vexy`
+==============
+
+.. py:module:: vexy
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   parser/index.rst
+   sources/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   __main__/index.rst
+   client/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   vexy.EcoSystemType
+   vexy.EcoSystem
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   vexy._ALL_ECOSYSTEMS
+
+
+.. py:class:: EcoSystemType(*, name: str, purl_type: str, description: str)
+
+   .. py:method:: name(self) -> str
+      :property:
+
+
+   .. py:method:: purl_type(self) -> str
+      :property:
+
+
+   .. py:method:: description(self) -> str
+      :property:
+
+
+
+.. py:data:: _ALL_ECOSYSTEMS
+   
+
+   
+
+.. py:class:: EcoSystem
+
+   Bases: :py:obj:`enum.Enum`
+
+   Languages/ecosystems to the PURL type
+
+   Starting list taken from https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst
+
+   .. py:attribute:: CARGO
+      :annotation: = CARGO
+
+      
+
+   .. py:attribute:: COCOAPODS
+      :annotation: = COCOAPODS
+
+      
+
+   .. py:attribute:: COMPOSER
+      :annotation: = COMPOSER
+
+      
+
+   .. py:attribute:: CONAN
+      :annotation: = CONAN
+
+      
+
+   .. py:attribute:: CONDA
+      :annotation: = CONDA
+
+      
+
+   .. py:attribute:: CRAN
+      :annotation: = CRAN
+
+      
+
+   .. py:attribute:: GO
+      :annotation: = GO
+
+      
+
+   .. py:attribute:: MAVEN
+      :annotation: = MAVEN
+
+      
+
+   .. py:attribute:: NPM
+      :annotation: = NPM
+
+      
+
+   .. py:attribute:: NUGET
+      :annotation: = NUGET
+
+      
+
+   .. py:attribute:: PYPI
+      :annotation: = PYPI
+
+      
+
+   .. py:attribute:: RPM
+      :annotation: = RPM
+
+      
+
+   .. py:attribute:: RUBY_GEM
+      :annotation: = RUBY_GEM
+
+      
+
+   .. py:attribute:: SWIFT
+      :annotation: = SWIFT
+
+      
+
+   .. py:method:: get_info(self) -> EcoSystemType
+
+
+
