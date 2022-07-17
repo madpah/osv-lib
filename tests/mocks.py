@@ -17,9 +17,10 @@
 
 import json
 import os
+from typing import Callable, Optional
+
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
-from typing import Callable, Optional
 
 from . import FIXTURES_DIRECTORY
 

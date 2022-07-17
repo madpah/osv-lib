@@ -15,14 +15,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) Paul Horton. All Rights Reserved.
 import datetime
-import os
 import json
+import os
 from unittest import TestCase
 
-# See https://github.com/package-url/packageurl-python/issues/65
-from packageurl import PackageURL  # type: ignore
-
-from osv.model import OsvVulnerability, OsvVulnerabilityId, OsvSeverityType
+from osv.model import OsvSeverityType, OsvVulnerability, OsvVulnerabilityId
 
 from . import FIXTURES_DIRECTORY
 

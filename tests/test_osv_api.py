@@ -15,14 +15,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) Paul Horton. All Rights Reserved.
 import datetime
-from unittest import mock, TestCase
+from unittest import TestCase, mock
 from unittest.mock import Mock
 
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
 
 from osv.api import OsvApi
-from osv.model import OsvPackage, OsvVulnerability, OsvVulnerabilityId, OsvSeverityType
+from osv.model import OsvPackage, OsvSeverityType, OsvVulnerability, OsvVulnerabilityId
+
 from .mocks import mock_osv_post_query
 
 

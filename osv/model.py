@@ -19,14 +19,14 @@ import enum
 import inspect
 import re
 from copy import copy
-
 from datetime import datetime
-# See https://github.com/package-url/packageurl-python/issues/65
-from packageurl import PackageURL  # type: ignore
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-from osv.exception import InvalidVulnerabilityIdException, InvalidAffectedRange, InvalidVersionRangeEvent
-from serializer import JsonDeserialisable
+# See https://github.com/package-url/packageurl-python/issues/65
+from packageurl import PackageURL  # type: ignore
+
+from .exception import InvalidAffectedRange, InvalidVersionRangeEvent, InvalidVulnerabilityIdException
+from .serializer import JsonDeserialisable
 
 """
 Pythonic model classes that represent the datastructures used in OSV.
@@ -127,7 +127,7 @@ class OsvCredit:
 
     def __init__(self, *, name: str, contact: Optional[Iterable[str]] = None) -> None:
         self.name = name
-        self.contact = contact
+        self.contact = contact or None
 
     @property
     def name(self) -> str:
@@ -161,7 +161,7 @@ class OsvCredit:
 
     @contact.setter
     def contact(self, contact: Optional[Iterable[str]]) -> None:
-        self._contact = set(contact)
+        self._contact = set(contact) if contact else {}
 
 
 class OsvPackage:

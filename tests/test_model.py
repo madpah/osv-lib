@@ -19,14 +19,14 @@ import json
 from unittest import TestCase
 
 from osv.exception import InvalidAffectedRange
-from osv.model import OsvVersionRange, OsvVersionRangeType, OsvVulnerabilityId, OsvPackage, OsvEcosystem
+from osv.model import OsvEcosystem, OsvPackage, OsvVersionRange, OsvVersionRangeType, OsvVulnerabilityId
 
 
 class TestModelOsvVersionRange(TestCase):
 
     def test_invalid_type_single_event(self) -> None:
         with self.assertRaises(InvalidAffectedRange):
-            vr = OsvVersionRange.from_json(
+            OsvVersionRange.from_json(
                 data=json.loads('{"events": [{ "introduced": "1.0.0" }, { "fixed": "1.2.3" } ], "type": "WRONG"}')
             )
 

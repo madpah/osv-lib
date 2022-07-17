@@ -66,7 +66,7 @@ def pythonify_key_names(d: Dict[str, Any]) -> Dict[Any, Any]:
 #     )
 
 
-_HYPHENATED_ATTRIBUTES = [
+_HYPHENATED_ATTRIBUTES: List[str] = [
     # 'bom_ref', 'mime_type', 'x_trust_boundary'
 ]
 _PYTHON_TO_JSON_NAME = re.compile(r'_([a-z])')
