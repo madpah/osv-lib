@@ -1,7 +1,7 @@
 {
   "id": "GHSA-vh95-rmgr-6w4m",
   "summary": "Prototype Pollution in minimist",
-  "details": "Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n\n\n\n## Recommendation\n\nUpgrade to versions 0.2.1, 1.2.3 or later.",
+  "details": "Affected versions of `minimist` are vulnerable to prototype pollution.",
   "aliases": [
     "CVE-2020-7598"
   ],

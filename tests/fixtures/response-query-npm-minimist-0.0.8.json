@@ -109,7 +109,7 @@
     {
       "id": "GHSA-xvch-5gv4-984h",
       "summary": "Prototype Pollution in minimist",
-      "details": "Minimist \u003c=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).",
+      "details": "Minimist \u003c=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey()",
       "aliases": [
         "CVE-2021-44906"
       ],

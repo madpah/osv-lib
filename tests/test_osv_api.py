@@ -53,7 +53,7 @@ class TestOsvApi(TestCase):
         self.assertEqual(0, len(vuln_984h.related))
         self.assertEqual('Prototype Pollution in minimist', vuln_984h.summary)
         self.assertEqual(
-            """Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).""",
+            'Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey()',
             vuln_984h.details)
         self.assertEqual(1, len(vuln_984h.severity))
         severity = vuln_984h.severity.pop()

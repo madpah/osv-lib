@@ -18,16 +18,16 @@
 import re
 from abc import abstractmethod
 from json import JSONEncoder
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
 
 
 class JsonDeserialisable:
-    """
 
-    """
+    def __init__(self, *args: str, **kwargs: int) -> None:
+        pass
 
     @staticmethod
     @abstractmethod
@@ -49,26 +49,7 @@ def pythonify_key_names(d: Dict[str, Any]) -> Dict[Any, Any]:
     return named_d
 
 
-# def json_decoder(o: object) -> object:
-#     if isinstance(o, dict):
-#         named_o = pythonify_key_names(d=o)
-#         try:
-#             if 'coordinates' in named_o.keys():
-#                 return OssIndexComponent(**named_o)
-#             elif 'id_' in named_o.keys():
-#                 return Vulnerability(**named_o)
-#         except TypeError as e:
-#             print(f'Error was on {o}')
-#             raise e
-#
-#     raise ValueError(
-#         f'Unknown value in JSON being decoded: {o}'
-#     )
-
-
-_HYPHENATED_ATTRIBUTES: List[str] = [
-    # 'bom_ref', 'mime_type', 'x_trust_boundary'
-]
+_HYPHENATED_ATTRIBUTES: List[str] = []
 _PYTHON_TO_JSON_NAME = re.compile(r'_([a-z])')
 
 

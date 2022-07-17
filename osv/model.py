@@ -20,7 +20,7 @@ import inspect
 import re
 from copy import copy
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Type
 
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
@@ -33,7 +33,7 @@ Pythonic model classes that represent the datastructures used in OSV.
 
 .. see:
     https://osv.dev/docs/osv_service_v1.swagger.json
-    
+
 .. see:
     https://ossf.github.io/osv-schema/
     https://github.com/ossf/osv-schema/blob/main/validation/schema.json
@@ -127,7 +127,7 @@ class OsvCredit:
 
     def __init__(self, *, name: str, contact: Optional[Iterable[str]] = None) -> None:
         self.name = name
-        self.contact = contact or None
+        self.contact = contact or []  # type: ignore
 
     @property
     def name(self) -> str:
@@ -160,8 +160,8 @@ class OsvCredit:
         return self._contact
 
     @contact.setter
-    def contact(self, contact: Optional[Iterable[str]]) -> None:
-        self._contact = set(contact) if contact else {}
+    def contact(self, contact: Iterable[str]) -> None:
+        self._contact = set(contact)
 
 
 class OsvPackage:
@@ -355,6 +355,8 @@ class OsvVersionRange:
             if self.last_affected:
                 return f'<={self.last_affected}'
 
+            return ''
+
     @staticmethod
     def from_json(data: Dict[str, Any]) -> 'OsvVersionRange':
         if 'type' not in data:
@@ -418,7 +420,7 @@ class OsvVersionRange:
             `str`
         """
         vers_type = self.type_.value.lower()
-        if self._type_ == OsvVersionRangeType.ECOSYSTEM and package:
+        if self._type_ == OsvVersionRangeType.ECOSYSTEM and package and package.ecosystem:
             vers_type = package.ecosystem.value.lower()
         event_vers = '|'.join(list(map(lambda e: e.as_purl_vers_component(), self.events)))
         purl_vers = f'vers:{vers_type}/{event_vers}'
@@ -439,8 +441,8 @@ class OsvVulnerabilityId(str):
             raise InvalidVulnerabilityIdException(f'Supplied ID for Vulnerability does not match OSV Schema: {content}')
 
         db_prefix, entry_id = matches[0]
-        self._db_prefix = db_prefix.upper()
-        self._entry_id = entry_id
+        self._db_prefix: str = db_prefix.upper()
+        self._entry_id: str = entry_id
 
     @property
     def db_prefix(self) -> str:
@@ -475,7 +477,7 @@ class OsvVulnerabilityId(str):
         """
         return self.db_prefix in self._KNOWN_DATABASE_PREFIXES
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, OsvVulnerabilityId):
             return hash(self) == hash(other)
         return False
@@ -498,7 +500,7 @@ class OsvAffected(JsonDeserialisable):
                  versions: Optional[List[str]] = None) -> None:
         self._package = package
         self._ranges = ranges
-        self._versions = set(versions)
+        self._versions: List[str] = versions if versions else []
 
     @staticmethod
     def from_json(data: Dict[str, Any]) -> 'OsvAffected':
@@ -529,13 +531,13 @@ class OsvAffected(JsonDeserialisable):
         return self._ranges
 
     @property
-    def versions(self) -> Set[str]:
+    def versions(self) -> List[str]:
         """
         Set of strings where a string is a single affected version in whatever version syntax is used by the given
         package ecosystem.
 
         Returns:
-             `Set[str]` or `None`
+             `List[str]` or `None`
         """
         return self._versions
 
@@ -559,14 +561,14 @@ class OsvVulnerability:
         self.modified = modified
         self.published = published
         self.withdrawn = withdrawn
-        self.aliases = aliases or {}
-        self.related = related or {}
+        self.aliases = aliases or []  # type: ignore
+        self.related = related or []  # type: ignore
         self.summary = summary
         self.details = details
-        self.severity = severity or {}
-        self.affected = affected or {}
-        self.references = references or {}
-        self.credits = credits_ or {}
+        self.severity = severity or []  # type: ignore
+        self.affected = affected or []  # type: ignore
+        self.references = references or []  # type: ignore
+        self.credits = credits_ or []  # type: ignore
 
     @staticmethod
     def from_json(data: Dict[str, Any]) -> 'OsvVulnerability':
@@ -594,21 +596,20 @@ class OsvVulnerability:
 
         for k, v in v_data.items():
             if k in DATA_CLASS_MAPPINGS:
+                klass: type[JsonDeserialisable] = DATA_CLASS_MAPPINGS[k]
                 if isinstance(v, (list, set)):
                     items = []
                     for j in v:
-                        if inspect.isclass(DATA_CLASS_MAPPINGS[k]) and issubclass(DATA_CLASS_MAPPINGS[k],
-                                                                                  JsonDeserialisable):
-                            items.append(DATA_CLASS_MAPPINGS[k].from_json(data=j))
+                        if inspect.isclass(klass) and issubclass(klass, JsonDeserialisable):
+                            items.append(klass.from_json(data=j))
                         else:
-                            items.append(DATA_CLASS_MAPPINGS[k](j))
+                            items.append(klass(j))
                     v_data[k] = items
                 else:
-                    if inspect.isclass(DATA_CLASS_MAPPINGS[k]) and issubclass(DATA_CLASS_MAPPINGS[k],
-                                                                              JsonDeserialisable):
-                        v_data[k] = DATA_CLASS_MAPPINGS[k].from_json(data=v)
+                    if inspect.isclass(klass) and issubclass(klass, JsonDeserialisable):
+                        v_data[k] = klass.from_json(data=v)
                     else:
-                        v_data[k] = DATA_CLASS_MAPPINGS[k](v)
+                        v_data[k] = klass(v)
 
         return OsvVulnerability(**v_data)
 
@@ -709,7 +710,7 @@ class OsvVulnerability:
         return self._aliases
 
     @aliases.setter
-    def aliases(self, aliases: Optional[Iterable[OsvVulnerabilityId]]) -> None:
+    def aliases(self, aliases: Iterable[OsvVulnerabilityId]) -> None:
         self._aliases = set(aliases)
 
     @property
@@ -790,7 +791,7 @@ class OsvVulnerability:
         return self._affected
 
     @affected.setter
-    def affected(self, affected: Optional[Iterable[OsvAffected]]) -> None:
+    def affected(self, affected: Iterable[OsvAffected]) -> None:
         self._affected = set(affected)
 
     @property
@@ -804,7 +805,7 @@ class OsvVulnerability:
         return self._references
 
     @references.setter
-    def references(self, references: Optional[Iterable[OsvReference]]) -> None:
+    def references(self, references: Iterable[OsvReference]) -> None:
         self._references = set(references)
 
     @property
@@ -818,5 +819,5 @@ class OsvVulnerability:
         return self._credits
 
     @credits.setter
-    def credits(self, credits_: Optional[Iterable[OsvCredit]]) -> None:
+    def credits(self, credits_: Iterable[OsvCredit]) -> None:
         self._credits = set(credits_)

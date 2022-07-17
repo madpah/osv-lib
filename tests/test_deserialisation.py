@@ -55,15 +55,7 @@ class TestDeserialisation(TestCase):
             self.assertSetEqual({OsvVulnerabilityId('CVE-2020-7598')}, v.aliases)
             self.assertEqual(0, len(v.related))
             self.assertEqual('Prototype Pollution in minimist', v.summary)
-            self.assertEqual("""Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  
-Parsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  
-This is exploitable if attackers have control over the arguments being passed to `minimist`.
-
-
-
-## Recommendation
-
-Upgrade to versions 0.2.1, 1.2.3 or later.""", v.details)
+            self.assertEqual('Affected versions of `minimist` are vulnerable to prototype pollution.', v.details)
             self.assertEqual(1, len(v.severity))
             severity = v.severity.pop()
             self.assertEqual(OsvSeverityType.CVSS_V3, severity.type_)
