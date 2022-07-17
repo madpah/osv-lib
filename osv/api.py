@@ -18,15 +18,13 @@
 import json
 import logging
 import sys
-from typing import Dict, Iterable, Optional, Set, Union
+from typing import Any, Dict, Iterable, Optional, Set, Union
 
 import requests
 
 from .exception import InvalidQueryParameters, OsvApiErrorResponse
 from .model import OsvPackage, OsvVulnerability, OsvVulnerabilityId
 from .serializer import OsvJsonEncoder
-
-# from .serializer import json_decoder, OssIndexJsonEncoder
 
 logger = logging.getLogger('osv-lib')
 
@@ -66,26 +64,15 @@ class OsvApi:
         Returns:
             `Set[OsvVulnerability]`
         """
-        if 0 == sum(x is not None for x in (commit, version, package)):
-            raise InvalidQueryParameters('At least one of `commit`, `version` or `package` is required.')
-
-        if commit and version:
-            raise InvalidQueryParameters('If `commit` is supplied `version` cannot also be supplied.')
-
-        request_data = {}
-        if commit:
-            request_data.update({'commit': commit})
-        if version:
-            request_data.update({'version': version})
-        if package:
-            request_data.update({'package': json.loads(json.dumps(package, cls=OsvJsonEncoder))})
-
         api_url = self._get_api_url('query')
-        response = requests.post(url=api_url, headers=self._get_headers(), json=request_data)
+        response = requests.post(
+            url=api_url, headers=self._get_headers(),
+            json=OsvApi._make_query_payload(commit=commit, version=version, package=package)
+        )
 
         if not response.status_code == 200:
             raise OsvApiErrorResponse(
-                f'OSV API returned {response.status_code} for call to {api_url}: {response.json()}'
+                f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
             )
 
         vulnerabilities: Set[OsvVulnerability] = set()
@@ -94,8 +81,39 @@ class OsvApi:
 
         return vulnerabilities
 
-    def query_batch(self, *, packages: Iterable[OsvPackage]) -> None:
-        pass
+    def query_batch(self, *,
+                    queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]]) -> Set[OsvVulnerability]:
+        """
+        Implementation for POST /v1/querybatch
+
+        https://osv.dev/docs/#operation/OSV_QueryAffectedBatch
+
+        Returns:
+            `Set[OsvVulnerability]`
+        """
+        request_payload = []
+        for query in  queries:
+            request_payload.append(OsvApi._make_query_payload(**query))
+
+        api_url = self._get_api_url('querybatch')
+        response = requests.post(url=api_url, headers=self._get_headers(), json=request_payload)
+
+        if not response.status_code == 200:
+            raise OsvApiErrorResponse(
+                f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
+            )
+
+        vulnerabilities: Dict[str, Set[OsvVulnerability]] = {}
+        for query, vuln_data in zip(request_payload, response.json()['results']):
+            _hash = hash(str(query))
+            if _hash not in vulnerabilities:
+                vulnerabilities[_hash] = set()
+            for vuln in vuln_data['vulns']:
+                vulnerabilities[_hash].add(OsvVulnerability.from_json(data=vuln))
+
+        print(vulnerabilities)
+
+        return vulnerabilities
 
     def vulns(self, *, id_: Union[str, OsvVulnerabilityId]) -> None:
         pass
@@ -110,3 +128,22 @@ class OsvApi:
             'Content-type': 'application/json',
             'User-Agent': f'python-osv-lib@{osv_lib_version}'
         }
+
+    @staticmethod
+    def _make_query_payload(*, commit: Optional[str] = None, version: Optional[str] = None,
+                            package: Optional[OsvPackage] = None) -> Dict[str, Any]:
+        if 0 == sum(x is not None for x in (commit, version, package)):
+            raise InvalidQueryParameters('At least one of `commit`, `version` or `package` is required.')
+
+        if commit and version:
+            raise InvalidQueryParameters('If `commit` is supplied `version` cannot also be supplied.')
+
+        request_data = {}
+        if commit:
+            request_data.update({'commit': commit})
+        if version:
+            request_data.update({'version': version})
+        if package:
+            request_data.update({'package': json.loads(json.dumps(package, cls=OsvJsonEncoder))})
+
+        return request_data

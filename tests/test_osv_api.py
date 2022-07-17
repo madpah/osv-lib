@@ -24,7 +24,7 @@ from packageurl import PackageURL  # type: ignore
 from osv.api import OsvApi
 from osv.model import OsvPackage, OsvSeverityType, OsvVulnerability, OsvVulnerabilityId
 
-from .mocks import mock_osv_post_query
+from tests.mocks import mock_osv_post_query, mock_osv_post_query_batch
 
 
 class TestOsvApi(TestCase):
@@ -62,3 +62,35 @@ class TestOsvApi(TestCase):
         self.assertEqual(1, len(vuln_984h.affected))
         self.assertEqual(7, len(vuln_984h.references))
         self.assertEqual(0, len(vuln_984h.credits))
+
+    @mock.patch('requests.post', side_effect=mock_osv_post_query_batch)
+    def test_query_batch_with_response(self, mock_post: Mock) -> None:
+        api = OsvApi()
+        queries = [
+            {
+                'package': OsvPackage(purl=PackageURL.from_string('pkg:npm/minimist@0.0.8'))
+            }
+        ]
+        vulnerabilities = api.query_batch(queries=queries)
+        mock_post.assert_called()
+
+        self.assertEqual(1, len(vulnerabilities))
+        expected_hash_key = hash(str(OsvApi._make_query_payload(**queries.pop())))
+        self.assertTrue(expected_hash_key in vulnerabilities)
+        vulns = vulnerabilities.get(expected_hash_key)
+
+        vuln_6w4m = next((v for v in vulns if v.id_ == OsvVulnerabilityId('GHSA-vh95-rmgr-6w4m')), None)
+        self.assertIsInstance(vuln_6w4m, OsvVulnerability)
+        self.assertEqual(OsvVulnerabilityId('GHSA-vh95-rmgr-6w4m'), vuln_6w4m.id_)
+        self.assertEqual(
+            datetime.datetime(year=2022, month=4, day=26, hour=21, minute=1, second=40),
+            vuln_6w4m.modified
+        )
+
+        vuln_984h = next((v for v in vulns if v.id_ == OsvVulnerabilityId('GHSA-xvch-5gv4-984h')), None)
+        self.assertIsInstance(vuln_984h, OsvVulnerability)
+        self.assertEqual(OsvVulnerabilityId('GHSA-xvch-5gv4-984h'), vuln_984h.id_)
+        self.assertEqual(
+            datetime.datetime(year=2022, month=4, day=4, hour=21, minute=39, second=38),
+            vuln_984h.modified
+        )
