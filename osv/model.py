@@ -20,7 +20,7 @@ import inspect
 import re
 from copy import copy
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Type
 
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
@@ -596,7 +596,7 @@ class OsvVulnerability:
 
         for k, v in v_data.items():
             if k in DATA_CLASS_MAPPINGS:
-                klass: type[JsonDeserialisable] = DATA_CLASS_MAPPINGS[k]
+                klass: Type[JsonDeserialisable] = DATA_CLASS_MAPPINGS[k]
                 if isinstance(v, (list, set)):
                     items = []
                     for j in v:
