@@ -44,6 +44,15 @@ class MockResponse:
         return json.loads(self.text, object_hook=object_hook)
 
 
+def mock_osv_get_vulns(*args, **kwargs) -> MockResponse:
+    if 'url' in kwargs and kwargs['url'] == f'{OSV_API_BASE_URI}vulns':
+        request_params = kwargs['params'] if 'params' in kwargs else []
+        fixture = os.path.join(FIXTURES_DIRECTORY, f'response-vulns-{request_params.pop()}.json')
+        return _mock_response_from_fixture(fixture=fixture)
+
+    return MockResponse(None, 404)
+
+
 def mock_osv_post_query(*args, **kwargs) -> MockResponse:
     if 'url' in kwargs and kwargs['url'] == f'{OSV_API_BASE_URI}query':
         request_json = kwargs['json'] if 'json' in kwargs else {}

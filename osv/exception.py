@@ -23,21 +23,28 @@ class OsvException(Exception):
     pass
 
 
-class InvalidAffectedRange(OsvException):
+class InvalidAffectedRangeException(OsvException):
     """
     Raised if the supplied data when parsing an Affected Range is not valid.
     """
     pass
 
 
-class InvalidQueryParameters(OsvException):
+class InvalidDateException(OsvException):
+    """
+    Raised if we try to deserialise a date in an unexpected format.
+    """
+    pass
+
+
+class InvalidQueryParametersException(OsvException):
     """
     Raised if an invalid set of parameters are provided to a Query operation against OSV.
     """
     pass
 
 
-class InvalidVersionRangeEvent(OsvException):
+class InvalidVersionRangeEventException(OsvException):
     """
     Raised if a Version Range Event has more than one event defined.
     """
@@ -51,7 +58,7 @@ class InvalidVulnerabilityIdException(OsvException):
     pass
 
 
-class OsvApiErrorResponse(OsvException):
+class OsvApiErrorResponseException(OsvException):
     """
     Raised if OSV API returns an error.
     """

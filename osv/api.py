@@ -22,7 +22,7 @@ from typing import Any, Dict, Iterable, Optional, Set, Union
 
 import requests
 
-from .exception import InvalidQueryParameters, OsvApiErrorResponse
+from .exception import InvalidQueryParametersException, OsvApiErrorResponseException
 from .model import OsvPackage, OsvVulnerability, OsvVulnerabilityId
 from .serializer import OsvJsonEncoder
 
@@ -71,7 +71,7 @@ class OsvApi:
         )
 
         if not response.status_code == 200:
-            raise OsvApiErrorResponse(
+            raise OsvApiErrorResponseException(
                 f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
             )
 
@@ -92,14 +92,14 @@ class OsvApi:
             `Set[OsvVulnerability]`
         """
         request_payload = []
-        for query in  queries:
+        for query in queries:
             request_payload.append(OsvApi._make_query_payload(**query))
 
         api_url = self._get_api_url('querybatch')
         response = requests.post(url=api_url, headers=self._get_headers(), json=request_payload)
 
         if not response.status_code == 200:
-            raise OsvApiErrorResponse(
+            raise OsvApiErrorResponseException(
                 f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
             )
 
@@ -111,12 +111,26 @@ class OsvApi:
             for vuln in vuln_data['vulns']:
                 vulnerabilities[_hash].add(OsvVulnerability.from_json(data=vuln))
 
-        print(vulnerabilities)
-
         return vulnerabilities
 
-    def vulns(self, *, id_: Union[str, OsvVulnerabilityId]) -> None:
-        pass
+    def vulns(self, *, id_: Union[str, OsvVulnerabilityId]) -> OsvVulnerability:
+        """
+        Implementation for POST /v1/vulns
+
+        See: https://osv.dev/docs/#operation/OSV_GetVulnById
+
+        Returns:
+            `OsvVulnerability`
+        """
+        api_url = self._get_api_url('vulns')
+        response = requests.get(url=api_url, headers=self._get_headers(), params=[str(id_)])
+
+        if not response.status_code == 200:
+            raise OsvApiErrorResponseException(
+                f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
+            )
+
+        return OsvVulnerability.from_json(data=response.json())
 
     def _get_api_url(self, api_uri: str) -> str:
         return f'{self._api_host}/{self._api_version}/{api_uri}'
@@ -133,10 +147,10 @@ class OsvApi:
     def _make_query_payload(*, commit: Optional[str] = None, version: Optional[str] = None,
                             package: Optional[OsvPackage] = None) -> Dict[str, Any]:
         if 0 == sum(x is not None for x in (commit, version, package)):
-            raise InvalidQueryParameters('At least one of `commit`, `version` or `package` is required.')
+            raise InvalidQueryParametersException('At least one of `commit`, `version` or `package` is required.')
 
         if commit and version:
-            raise InvalidQueryParameters('If `commit` is supplied `version` cannot also be supplied.')
+            raise InvalidQueryParametersException('If `commit` is supplied `version` cannot also be supplied.')
 
         request_data = {}
         if commit:

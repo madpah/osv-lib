@@ -25,7 +25,12 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Type
 # See https://github.com/package-url/packageurl-python/issues/65
 from packageurl import PackageURL  # type: ignore
 
-from .exception import InvalidAffectedRange, InvalidVersionRangeEvent, InvalidVulnerabilityIdException
+from .exception import (
+    InvalidAffectedRangeException,
+    InvalidDateException,
+    InvalidVersionRangeEventException,
+    InvalidVulnerabilityIdException,
+)
 from .serializer import JsonDeserialisable
 
 """
@@ -40,11 +45,19 @@ Pythonic model classes that represent the datastructures used in OSV.
 """
 
 _PATTERN_DATE_TIME_RFC3339_Z = '%Y-%m-%dT%H:%M:%SZ'
+_PATTERN_DATE_TIME_RFC3339_MS_Z = '%Y-%m-%dT%H:%M:%S.%fZ'
 _PATTERN_VULNERABILITY_ID = re.compile(r'^([^\-]+)-(.*)')
 
 
 def _deserialise_date(date_str: str) -> datetime:
-    return datetime.strptime(date_str, _PATTERN_DATE_TIME_RFC3339_Z)
+    try:
+        return datetime.strptime(date_str, _PATTERN_DATE_TIME_RFC3339_Z)
+    except ValueError:
+        try:
+            return datetime.strptime(date_str, _PATTERN_DATE_TIME_RFC3339_MS_Z)
+        except ValueError:
+            raise InvalidDateException(f'Date string supplied ({date_str}) does not match either'
+                                       f'"{_PATTERN_DATE_TIME_RFC3339_Z}" or "{_PATTERN_DATE_TIME_RFC3339_MS_Z}"')
 
 
 @enum.unique
@@ -299,7 +312,7 @@ class OsvVersionRange:
         def __init__(self, *, introduced: Optional[str] = None, fixed: Optional[str] = None,
                      last_affected: Optional[str] = None, limit: Optional[str] = None) -> None:
             if 1 != sum(x is not None for x in (introduced, fixed, last_affected, limit)):
-                raise InvalidVersionRangeEvent(
+                raise InvalidVersionRangeEventException(
                     'affected[].ranges[].events[] can only contain a single event type'
                 )
             self._introduced = introduced
@@ -357,18 +370,27 @@ class OsvVersionRange:
 
             return ''
 
+        def __eq__(self, other: object) -> bool:
+            if isinstance(other, OsvVersionRange.OsvVersionRangeEvent):
+                return hash(other) == hash(self)
+
+            return False
+
+        def __hash__(self) -> int:
+            return hash((self._introduced, self._fixed, self._last_affected, self._limit))
+
     @staticmethod
     def from_json(data: Dict[str, Any]) -> 'OsvVersionRange':
         if 'type' not in data:
-            raise InvalidAffectedRange('"type" is a mandatory field for affected[].ranges[]')
+            raise InvalidAffectedRangeException('"type" is a mandatory field for affected[].ranges[]')
 
         if 'events' not in data:
-            raise InvalidAffectedRange('"events" is a mandatory field for affected[].ranges[]')
+            raise InvalidAffectedRangeException('"events" is a mandatory field for affected[].ranges[]')
 
         try:
             type_ = OsvVersionRangeType(data['type'])
         except ValueError:
-            raise InvalidAffectedRange(
+            raise InvalidAffectedRangeException(
                 f'supplied value for "type" ({data["type"]}) is not a permitted value'
             )
 
@@ -583,7 +605,8 @@ class OsvVulnerability:
             'severity': OsvSeverity,
             'affected': OsvAffected,
             'references': OsvReference,
-            'credits': OsvCredit
+            'credits': OsvCredit,
+            'schema_version': OsvSchemaVersion
         }
 
         v_data = copy(data)
