@@ -94,8 +94,7 @@ class OsvApi:
         """
         request_payload = []
         for query in queries:
-            print(query)
-            request_payload.append(OsvApi._make_query_payload(**query))
+            request_payload.append(OsvApi._make_query_payload(**query))  # type: ignore
 
         api_url = self._get_api_url('querybatch')
         response = requests.post(url=api_url, headers=self._get_headers(), json=request_payload)
