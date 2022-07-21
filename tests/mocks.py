@@ -45,9 +45,9 @@ class MockResponse:
 
 
 def mock_osv_get_vulns(*args, **kwargs) -> MockResponse:
-    if 'url' in kwargs and kwargs['url'] == f'{OSV_API_BASE_URI}vulns':
-        request_params = kwargs['params'] if 'params' in kwargs else []
-        fixture = os.path.join(FIXTURES_DIRECTORY, f'response-vulns-{request_params.pop()}.json')
+    if 'url' in kwargs and str(kwargs['url']).startswith(f'{OSV_API_BASE_URI}vulns'):
+        vulnerability_id = kwargs['url'].split('/')[-1]
+        fixture = os.path.join(FIXTURES_DIRECTORY, f'response-vulns-{vulnerability_id}.json')
         return _mock_response_from_fixture(fixture=fixture)
 
     return MockResponse(None, 404)

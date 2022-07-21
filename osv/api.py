@@ -82,7 +82,8 @@ class OsvApi:
         return vulnerabilities
 
     def query_batch(self, *,
-                    queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]]) -> Set[OsvVulnerability]:
+                    queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]]
+                    ) -> Dict[int, Set[OsvVulnerability]]:
         """
         Implementation for POST /v1/querybatch
 
@@ -93,6 +94,7 @@ class OsvApi:
         """
         request_payload = []
         for query in queries:
+            print(query)
             request_payload.append(OsvApi._make_query_payload(**query))
 
         api_url = self._get_api_url('querybatch')
@@ -103,7 +105,7 @@ class OsvApi:
                 f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
             )
 
-        vulnerabilities: Dict[str, Set[OsvVulnerability]] = {}
+        vulnerabilities: Dict[int, Set[OsvVulnerability]] = {}
         for query, vuln_data in zip(request_payload, response.json()['results']):
             _hash = hash(str(query))
             if _hash not in vulnerabilities:
@@ -122,8 +124,8 @@ class OsvApi:
         Returns:
             `OsvVulnerability`
         """
-        api_url = self._get_api_url('vulns')
-        response = requests.get(url=api_url, headers=self._get_headers(), params=[str(id_)])
+        api_url = self._get_api_url(f'vulns/{str(id_)}')
+        response = requests.get(url=api_url, headers=self._get_headers())
 
         if not response.status_code == 200:
             raise OsvApiErrorResponseException(
