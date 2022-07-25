@@ -82,8 +82,8 @@ class OsvApi:
         return vulnerabilities
 
     def query_batch(self, *,
-                    queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]]
-                    ) -> Dict[int, Set[OsvVulnerability]]:
+                    queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]],
+                    fully_hydrate: bool = False) -> Dict[int, Set[OsvVulnerability]]:
         """
         Implementation for POST /v1/querybatch
 
@@ -110,7 +110,11 @@ class OsvApi:
             if _hash not in vulnerabilities:
                 vulnerabilities[_hash] = set()
             for vuln in vuln_data['vulns']:
-                vulnerabilities[_hash].add(OsvVulnerability.from_json(data=vuln))
+                osv_vulnerability = OsvVulnerability.from_json(data=vuln)
+                if fully_hydrate:
+                    vulnerabilities[_hash].add(self.vulns(id_=osv_vulnerability.id_))
+                else:
+                    vulnerabilities[_hash].add(osv_vulnerability)
 
         return vulnerabilities
 
