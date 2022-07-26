@@ -97,7 +97,7 @@ class OsvApi:
             request_payload.append(OsvApi._make_query_payload(**query))  # type: ignore
 
         api_url = self._get_api_url('querybatch')
-        response = requests.post(url=api_url, headers=self._get_headers(), json=request_payload)
+        response = requests.post(url=api_url, headers=self._get_headers(), json={"queries": request_payload})
 
         if not response.status_code == 200:
             raise OsvApiErrorResponseException(
