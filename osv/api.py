@@ -76,14 +76,15 @@ class OsvApi:
             )
 
         vulnerabilities: Set[OsvVulnerability] = set()
-        for vuln_data in response.json()['vulns']:
-            vulnerabilities.add(OsvVulnerability.from_json(data=vuln_data))
+        if 'vulns' in response.json():
+            for vuln_data in response.json()['vulns']:
+                vulnerabilities.add(OsvVulnerability.from_json(data=vuln_data))
 
         return vulnerabilities
 
     def query_batch(self, *,
                     queries: Iterable[Dict[str, Union[Optional[str], Optional[OsvPackage]]]],
-                    fully_hydrate: bool = False) -> Dict[int, Set[OsvVulnerability]]:
+                    fully_hydrate: bool = False) -> Set[OsvVulnerability]:
         """
         Implementation for POST /v1/querybatch
 
@@ -104,17 +105,16 @@ class OsvApi:
                 f'OSV API returned {response.status_code} for call to {api_url}: {response.text}'
             )
 
-        vulnerabilities: Dict[int, Set[OsvVulnerability]] = {}
-        for query, vuln_data in zip(request_payload, response.json()['results']):
-            _hash = hash(str(query))
-            if _hash not in vulnerabilities:
-                vulnerabilities[_hash] = set()
-            for vuln in vuln_data['vulns']:
-                osv_vulnerability = OsvVulnerability.from_json(data=vuln)
-                if fully_hydrate:
-                    vulnerabilities[_hash].add(self.vulns(id_=osv_vulnerability.id_))
-                else:
-                    vulnerabilities[_hash].add(osv_vulnerability)
+        vulnerabilities: Set[OsvVulnerability] = set()
+        if 'results' in response.json():
+            for vuln_data in response.json()['results']:
+                if 'vulns' in vuln_data:
+                    for vuln in vuln_data['vulns']:
+                        osv_vulnerability = OsvVulnerability.from_json(data=vuln)
+                        if fully_hydrate:
+                            vulnerabilities.add(self.vulns(id_=osv_vulnerability.id_))
+                        else:
+                            vulnerabilities.add(osv_vulnerability)
 
         return vulnerabilities
 

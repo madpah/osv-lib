@@ -67,7 +67,7 @@ def mock_osv_post_query(*args, **kwargs) -> MockResponse:
 def mock_osv_post_query_batch(*args, **kwargs) -> MockResponse:
     if 'url' in kwargs and kwargs['url'] == f'{OSV_API_BASE_URI}querybatch':
         request_json = kwargs['json'] if 'json' in kwargs else {}
-        purl = PackageURL.from_string(purl=request_json[0]['package']['purl'])
+        purl = PackageURL.from_string(purl=request_json['queries'][0]['package']['purl'])
         fixture = os.path.join(FIXTURES_DIRECTORY, f'response-querybatch-{purl.type}-{purl.name}-{purl.version}.json')
 
         return _mock_response_from_fixture(fixture=fixture)

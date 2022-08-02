@@ -128,12 +128,9 @@ class TestOsvApi(TestCase):
         vulnerabilities = api.query_batch(queries=queries)
         mock_post.assert_called()
 
-        self.assertEqual(1, len(vulnerabilities))
-        expected_hash_key = hash(str(OsvApi._make_query_payload(**queries.pop())))
-        self.assertTrue(expected_hash_key in vulnerabilities)
-        vulns = vulnerabilities.get(expected_hash_key)
+        self.assertEqual(2, len(vulnerabilities))
 
-        vuln_6w4m = next((v for v in vulns if v.id_ == OsvVulnerabilityId('GHSA-vh95-rmgr-6w4m')), None)
+        vuln_6w4m = next((v for v in vulnerabilities if v.id_ == OsvVulnerabilityId('GHSA-vh95-rmgr-6w4m')), None)
         self.assertIsInstance(vuln_6w4m, OsvVulnerability)
         self.assertEqual(OsvVulnerabilityId('GHSA-vh95-rmgr-6w4m'), vuln_6w4m.id_)
         self.assertEqual(
@@ -141,7 +138,7 @@ class TestOsvApi(TestCase):
             vuln_6w4m.modified
         )
 
-        vuln_984h = next((v for v in vulns if v.id_ == OsvVulnerabilityId('GHSA-xvch-5gv4-984h')), None)
+        vuln_984h = next((v for v in vulnerabilities if v.id_ == OsvVulnerabilityId('GHSA-xvch-5gv4-984h')), None)
         self.assertIsInstance(vuln_984h, OsvVulnerability)
         self.assertEqual(OsvVulnerabilityId('GHSA-xvch-5gv4-984h'), vuln_984h.id_)
         self.assertEqual(
